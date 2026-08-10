@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, staging, main]
+  push:
+    branches: [staging, main]
+
+jobs:
+  infra-test:
+    name: Lint + test infra (CDK)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: pip install flake8
+      - run: flake8 mino_infra --max-line-length=100
+      - run: pytest -v
+
+  infra-deploy-staging:
+    name: Deploy infra to staging
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+    needs: infra-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install -g aws-cdk
+      - run: pip install -r requirements.txt
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_STAGING }}
+          aws-region: us-east-1
+      - run: cdk deploy mino-dev-stack --require-approval never
+
+  infra-deploy-prod:
+    name: Deploy infra to prod
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: infra-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install -g aws-cdk
+      - run: pip install -r requirements.txt
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_PROD }}
+          aws-region: us-east-1
+      - run: cdk deploy mino-prod-stack --require-approval never

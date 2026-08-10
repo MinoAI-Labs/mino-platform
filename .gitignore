@@ -1,0 +1,33 @@
+# CDK
+infra/cdk.out/
+infra/.venv/
+infra/**/__pycache__/
+infra/**/*.pyc
+
+# Node
+node_modules/
+npm-debug.log*
+dist/
+build/
+
+# Python (agents / lambdas)
+**/__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Env / secrets — never commit these
+.env
+.env.*
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Test / coverage
+.pytest_cache/
+htmlcov/
+.coverage
