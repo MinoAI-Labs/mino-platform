@@ -1108,12 +1108,12 @@ Both became setup questions. HubSpot stamps automation-made tasks with `hs_objec
 | Association batch reads (deal↔contact↔company, activity→deal/contact, task→deal) | ✅ all 9 pairs, one call each (up to 1,000 IDs per call) |
 | Delta polling on `hs_lastmodifieddate` (contacts: `lastmodifieddate`) | ✅ works for deals, contacts, emails, notes |
 | Change → visible in search | ✅ **8 seconds**, so a 5–15 minute poll (D7) is safe |
-| Attachments (Files API) | ⏳ not tested yet: the seed key lacked the `files` scope, so no test files were uploaded |
+| Attachments (Files API) | ✅ file attached to a note in the HubSpot UI (`HIDDEN_PRIVATE`, 434 KB): metadata read, signed URL issued, **full download OK** with the read-only key + `files` scope. The CDN returns **403 to Python's default User-Agent**, so the downloader must send a normal User-Agent header |
 | Throughput | 28 calls, 23 s for the whole test portal; a typical design partner is ~2,100 calls ≈ 4 minutes of HubSpot time |
 
-Conclusion: **migration with a customer-created, read-only Service Key is feasible.** Attachments are the only part still to confirm.
+Conclusion: **migration with a customer-created, read-only Service Key is feasible end to end**, attachments included.
 
-**Follow-ups:** (1) ~~build the behavioural workflow-inference signals (D8)~~ done, including amount conditions; (1b) ~~migration read test~~ done except attachments; (2) fix the seed close-date order; (3) test migration read volumes (engagements, files) with the same key.
+**Follow-ups:** (1) ~~build the behavioural workflow-inference signals (D8)~~ done, including amount conditions; (1b) ~~migration read test~~ done, attachments included; (2) fix the seed close-date order; (3) test migration read volumes (engagements, files) with the same key.
 
 ---
 
