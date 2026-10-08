@@ -17,6 +17,8 @@
 | D3 | Auth model | **Changed 2026-10-08:** no Mino-built HubSpot app. The customer creates a read-only **Service Key** in their HubSpot and pastes it into Mino during setup (supersedes the public OAuth app in v0.1/v0.2) |
 | D7 | Live sync during cutover window | Service Keys cannot receive webhooks → delta sync is **polling only** (reconcile poll, §8.4) |
 | D8 | Automation rules (workflows) | HubSpot blocks workflow reads for Service Keys (§14). V1: **ask + infer** — Admin Agent asks 2–3 process questions; Mino infers automations from behaviour (e.g. identical tasks created right after a stage change) |
+| D9 | "Parking" stages (e.g. *On Hold*) | **Decided 2026-10-08:** not migrated as a stage. A parked deal keeps its real stage and gets a **paused status** in Mino |
+| D10 | Lifetime of the customer's HubSpot key | **Decided 2026-10-08:** stored encrypted and **deleted automatically after cutover**. The setup screen promises this to the customer |
 | D4 | Migration model | Cutover + delta sync: full historical load, temporary sync until the customer switches HubSpot off |
 | D5 | Region | us-east-1 primary / us-west-2 DR (locked). The brief's il-central-1 line is superseded |
 | **D6** | **Product principle** | **Mino does not build on top of HubSpot or replicate it.** Discovery extracts *company memory and process* as evidence; the Admin Agent asks the admin questions based on that evidence; the answers configure Mino in Mino's own model. HubSpot structures are never copied 1:1 without an admin decision |
