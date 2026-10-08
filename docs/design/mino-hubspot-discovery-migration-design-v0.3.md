@@ -1099,7 +1099,21 @@ Both became setup questions. HubSpot stamps automation-made tasks with `hs_objec
 
 **Migration lesson:** HubSpot batch-create responses are **not returned in input order**. Migration must map created records by `objectWriteTraceId` (or a unique property), never by position.
 
-**Follow-ups:** (1) ~~build the behavioural workflow-inference signals (D8)~~ done, including amount conditions; (2) fix the seed close-date order; (3) test migration read volumes (engagements, files) with the same key.
+**Migration read test (same day, real HubSpot, read-only key):**
+
+| Capability | Result |
+|---|---|
+| Bulk read: companies, contacts, deals, line items, products, emails, calls, meetings, notes, tasks | ✅ all readable, 100 records per call |
+| Full email bodies (`hs_email_text`, `hs_email_html`) | ✅ 62 of 62, **without** the `sales-email-read` scope |
+| Association batch reads (deal↔contact↔company, activity→deal/contact, task→deal) | ✅ all 9 pairs, one call each (up to 1,000 IDs per call) |
+| Delta polling on `hs_lastmodifieddate` (contacts: `lastmodifieddate`) | ✅ works for deals, contacts, emails, notes |
+| Change → visible in search | ✅ **8 seconds**, so a 5–15 minute poll (D7) is safe |
+| Attachments (Files API) | ⏳ not tested yet: the seed key lacked the `files` scope, so no test files were uploaded |
+| Throughput | 28 calls, 23 s for the whole test portal; a typical design partner is ~2,100 calls ≈ 4 minutes of HubSpot time |
+
+Conclusion: **migration with a customer-created, read-only Service Key is feasible.** Attachments are the only part still to confirm.
+
+**Follow-ups:** (1) ~~build the behavioural workflow-inference signals (D8)~~ done, including amount conditions; (1b) ~~migration read test~~ done except attachments; (2) fix the seed close-date order; (3) test migration read volumes (engagements, files) with the same key.
 
 ---
 
